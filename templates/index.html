@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Classifier</title>
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Header Section */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            color: #4CAF50;
+        }
+
+        header p {
+            color: #777;
+        }
+
+        /* Upload Section */
+        .upload-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .file-input {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .upload-label {
+            background-color: #4CAF50;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .submit-button {
+            background-color: #4CAF50;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .submit-button:hover {
+            background-color: #45a049;
+        }
+
+        /* Preview Image */
+        .preview-image {
+            max-width: 150px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            border: 2px solid #4CAF50;
+        }
+
+        /* Result Section */
+        .result-section {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .result-section h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        #uploadedImage {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        #predictionResult {
+            font-size: 1.4rem;
+            color: #333;
+            font-weight: bold;
+        }
+
+        /* Camera Section */
+        .camera-section {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .camera-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .camera-button:hover {
+            background-color: #45a049;
+        }
+
+        .camera-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        #video,
+        #canvas {
+            border: 2px solid #4CAF50;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        /* Bin Display */
+        .bin-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .bin {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .bin img {
+            max-width: 100px;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        .bin p {
+            margin-top: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* Mobile Responsiveness */
+        @media only screen and (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            header p {
+                font-size: 0.9rem;
+            }
+
+            .submit-button {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>AI Image Classifier</h1>
+            <p>Upload an image to classify its category with AI-powered predictions!</p>
+        </header>
+
+        <section class="upload-section">
+            <img id="imagePreview" class="preview-image" src="" alt="Preview" style="display:none;">
+            <form id="uploadForm" enctype="multipart/form-data">
+                <div class="file-input">
+                    <label for="fileInput" class="upload-label">Choose an Image</label>
+                    <input type="file" id="fileInput" name="file" accept="image/*" required>
+                </div>
+                <button type="submit" class="submit-button">Predict</button>
+            </form>
+        </section>
+
+        <!-- Camera Capture Section -->
+        <section class="camera-section">
+            <h2>Or Capture Live Photo</h2>
+            <button id="startCamera" class="camera-button">Start Camera</button>
+            <div class="camera-container">
+                <video id="video" width="300" height="200" autoplay style="display:none;"></video>
+                <canvas id="canvas" width="300" height="200" style="display:none;"></canvas>
+                <button id="capture" class="camera-button" style="display:none;">Capture Photo</button>
+                <button id="predictCamera" class="camera-button" style="display:none;">Predict from Camera</button>
+            </div>
+        </section>
+
+        <section class="result-section" id="resm" hidden>
+            <h2>Prediction Result</h2>
+            <div id="resultContainer">
+                <img id="uploadedImage" src="" alt="Uploaded Image" style="display: none;" />
+                <p id="predictionResult"></p>
+            </div>
+            <button id="recycle" type="submit" class="submit-button">want to dumb?</button>
+            <button id="unique" type="submit" class="submit-button">Want to do any creativity?</button>
+            <!-- Bin Section -->
+            <div class="bin-container" id="binimg" hidden>
+                <div class="bin" id="recycleBin">
+                    <h4>Put inside</h4>
+                    <img src="{{ url_for('static', filename='images/recycle_bin.jpg') }}" alt="Recycle Bin">
+                    <p>Recycle Bin</p>
+                </div>
+                <div class="bin" id="hazardousBin">
+                    <h4>Put inside</h4>
+                    <img src="{{ url_for('static', filename='images/hazardous_bin.jpg') }}" alt="Hazardous Bin">
+                    <p>Hazardous Bin</p>
+                </div>
+                <div class="bin" id="foodWasteBin">
+                    <h4>Put inside</h4>
+                    <img src="{{ url_for('static', filename='images/food_waste_bin.jpg') }}" alt="Food Waste Bin">
+                    <p>Food Waste Bin</p>
+                </div>
+            </div>
+        </section>
+
+
+    </div>
+
+    <script>
+        // Handling file upload and preview
+        const fileInput = document.getElementById('fileInput');
+        const imagePreview = document.getElementById('imagePreview');
+        fileInput.addEventListener('change', function () {
+            const file = fileInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Handling file upload and prediction
+        const uploadForm = document.getElementById('uploadForm');
+        const resultContainer = document.getElementById('resultContainer');
+        const uploadedImage = document.getElementById('uploadedImage');
+        const predictionResult = document.getElementById('predictionResult');
+
+        uploadForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const formData = new FormData(uploadForm);
+            const response = await fetch('/predict', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            const resm = document.getElementById('resm');
+            resm.removeAttribute('hidden');
+            // Display the uploaded image
+            uploadedImage.src = URL.createObjectURL(formData.get('file'));
+            uploadedImage.style.display = 'block';
+
+            // Display the prediction result
+            predictionResult.textContent = data.result;
+            const s = data.result;
+            let s1 = "";
+            for (let i = 9; i < 30; i++) {
+                if (s[i] == " ") {
+                    break;
+                }
+                s1 = s1 + s[i];
+            }
+
+
+            // Determine which bin to show based on prediction
+            const recyclebutton=document.getElementById('recycle');
+            recyclebutton.addEventListener('click',()=>{
+            const binimg=document.getElementById('binimg');
+            binimg.removeAttribute('hidden');
+            const wasteType = s1.toLowerCase();
+            recycleBin.style.display = 'none';
+            hazardousBin.style.display = 'none';
+            foodWasteBin.style.display = 'none';
+
+            let cat = ["metal", "paper", "plastic", "glass", "cardboard"];
+            let b = false;
+            for (let i = 0; i < 5; i++) {
+                if (cat[i] == wasteType) {
+                    b = true;
+                }
+
+            }
+            if (b) {
+                recycleBin.style.display = 'flex';
+            }
+            else {
+                if (wasteType == "battery") {
+                    hazardousBin.style.display = 'flex';
+                }
+                else if (wasteType == "food_waste") {
+                    foodWasteBin.style.display = 'flex';
+                }
+            }
+            })
+        });
+
+        // Camera capture and prediction
+        const startCameraButton = document.getElementById('startCamera');
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const captureButton = document.getElementById('capture');
+        const predictCameraButton = document.getElementById('predictCamera');
+
+        // Start camera when button is clicked
+        startCameraButton.addEventListener('click', () => {
+            navigator.mediaDevices.getUserMedia({ video: {
+                facingMode: {ideal: 'environment'}
+            } })
+                .then((stream) => {
+                    video.srcObject = stream;
+                    video.style.display = 'block';
+                    captureButton.style.display = 'block';
+                })
+                .catch((err) => {
+                    console.error('Error accessing camera: ', err);
+                });
+        });
+
+        // Capture image from camera
+        captureButton.addEventListener('click', () => {
+            const context = canvas.getContext('2d');
+            canvas.style.display = 'block';
+            video.style.display = 'none';
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            predictCameraButton.style.display = 'block';
+
+            // Display captured image in preview before prediction
+            const dataURL = canvas.toDataURL('image/png');
+            imagePreview.src = dataURL;
+            imagePreview.style.display = 'block';
+        });
+
+        // Predict using captured camera photo
+        predictCameraButton.addEventListener('click', async () => {
+            canvas.toBlob(async (blob) => {
+                const formData = new FormData();
+                formData.append('file', blob, 'captured_image.png');
+
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                const resm = document.getElementById('resm');
+                resm.removeAttribute('hidden');
+                // Display the captured image and prediction result
+                uploadedImage.src = canvas.toDataURL();
+                uploadedImage.style.display = 'block';
+                predictionResult.textContent = data.result;
+                const s = data.result;
+                let s1 = "";
+                for (let i = 9; i < 30; i++) {
+                    if (s[i] == " ") {
+                        break;
+                    }
+                    s1 = s1 + s[i];
+                }
+
+
+                // Determine which bin to show based on prediction
+                const wasteType = s1.toLowerCase();
+                recycleBin.style.display = 'none';
+                hazardousBin.style.display = 'none';
+                foodWasteBin.style.display = 'none';
+
+                let cat = ["metal", "paper", "plastic", "glass", "cardboard"];
+                let b = false;
+                for (let i = 0; i < 5; i++) {
+                    if (cat[i] == wasteType) {
+                        b = true;
+                    }
+
+                }
+                if (b) {
+                    recycleBin.style.display = 'flex';
+                }
+                else {
+                    if (wasteType == "battery") {
+                        hazardousBin.style.display = 'flex';
+                    }
+                    else if (wasteType == "food_waste") {
+                        foodWasteBin.style.display = 'flex';
+                    }
+                }
+
+            });
+        });
+
+
+    </script>
+</body>
+
+</html>

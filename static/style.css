@@ -1,0 +1,142 @@
+Google One subscription will be canceled … Update your payment method by Oct 18, 2024 to renew your storage subscription
+html {
+    font-size: 16px;
+    font-family: 'Figtree', sans-serif;
+    line-height: 1.5;
+}
+
+body {
+    color: #D0D0D1;
+}
+
+.muted {
+    color: #8A8B8C;
+}
+
+h2 {
+    margin: 0 0 1rem;
+}
+
+h2 {
+    margin: 1rem 0;
+}
+
+h2 {
+    font-size: 2.25rem;
+}
+
+h3 {
+    font-size: 1rem;
+}
+
+.large {
+    font-size: 1.125rem;
+}
+
+#feature {
+    position: relative;
+    background-color: #151618;
+    padding: 8rem 6rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8rem;
+    height: 100vh;
+}
+
+#feature header {
+    margin-bottom: 4rem;
+}
+
+#content {
+    max-width: 40rem;
+}
+
+#grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+
+@media screen and (max-width: 600px) {
+    .search-bar input[type="text"] {
+        width: 100%;
+    }
+
+    .search-bar button[type="submit"] {
+        width: 100%;
+    }
+}
+
+.search-bar {
+    position: absolute;
+    width: 40%;
+    margin: 0 auto;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    top: 90%;
+}
+
+.search-bar form {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.search-bar input[type="text"] {
+    width: 90%;
+    height: 40px;
+    padding: 10px;
+    border: none;
+    border-radius: 20px 0 0 20px;
+    font-size: 16px;
+}
+
+.search-button,
+.mic-button,
+.file-button,
+.search-submit-button,
+.camera-button {
+    width: 40px;
+    height: 40px;
+    background-color: #4CAF50;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    margin: 5px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.search-button,
+.mic-button,
+.file-button {
+    margin-right: 10px;
+}
+
+.search-submit-button {
+    background-color: #4CAF50;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    border-radius: 20px 20px 20px 20px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.search-button:hover,
+.mic-button:hover,
+.file-button:hover,
+.search-submit-button:hover {
+    background-color: #3e8e41;
+}
+
+.search-bar input[type="text"]:focus {
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
